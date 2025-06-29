@@ -1,0 +1,349 @@
+pre-event-checklist/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaizen Pre-Event Checklist</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .checklist {
+            margin: 30px 0;
+        }
+        
+        .checklist h3 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .task {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .task:hover {
+            background: #e9ecef;
+        }
+        
+        .task.completed {
+            background: rgba(40, 167, 69, 0.1);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #007bff;
+            border-radius: 4px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .task.completed .checkbox {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        
+        .task-text {
+            flex: 1;
+        }
+        
+        .priority {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        
+        .priority.high { background: #dc3545; color: white; }
+        .priority.medium { background: #ffc107; color: #333; }
+        .priority.low { background: #6c757d; color: white; }
+        
+        .progress-info {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #333; }
+        
+        .btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Kaizen Pre-Event Checklist</h1>
+        <p>Complete preparation checklist for a successful one-day Kaizen event</p>
+        
+        <div class="progress-info">
+            Progress: <span id="completed">0</span>/<span id="total">0</span> tasks completed (<span id="percentage">0</span>%)
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="checklist">
+            <h3>📅 2 Weeks Before Event</h3>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Define clear problem statement and scope</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Secure executive sponsor approval</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Select cross-functional team (5-8 people)</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Book appropriate room with wall space</div>
+                <div class="priority medium">Important</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Send calendar invites to all participants</div>
+                <div class="priority medium">Important</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Order supplies (sticky notes, markers, flip charts)</div>
+                <div class="priority medium">Important</div>
+            </div>
+        </div>
+        
+        <div class="checklist">
+            <h3>📅 1 Week Before Event</h3>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Conduct voice of customer interviews</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Create draft current state process map</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Prepare SIPOC diagram</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Arrange catering/refreshments</div>
+                <div class="priority medium">Important</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Customize PowerPoint presentation</div>
+                <div class="priority medium">Important</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Print all handouts and templates</div>
+                <div class="priority medium">Important</div>
+            </div>
+        </div>
+        
+        <div class="checklist">
+            <h3>📅 Day Before Event</h3>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Confirm all participant attendance</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Test technology and equipment</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Set up room layout</div>
+                <div class="priority medium">Important</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Prepare welcome materials</div>
+                <div class="priority medium">Important</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Review facilitation script</div>
+                <div class="priority high">Critical</div>
+            </div>
+            <div class="task" onclick="toggleTask(this)">
+                <div class="checkbox"></div>
+                <div class="task-text">Get good night's sleep!</div>
+                <div class="priority high">Critical</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-success" onclick="downloadChecklist()">📄 Download Checklist</button>
+            <button class="btn btn-warning" onclick="resetChecklist()">🔄 Reset All</button>
+        </div>
+    </div>
+    
+    <script>
+        let tasks = [];
+        let progress = {}; // In-memory storage for progress
+        
+        function initializeTasks() {
+            tasks = Array.from(document.querySelectorAll('.task'));
+            updateProgress();
+        }
+        
+        function toggleTask(taskElement) {
+            taskElement.classList.toggle('completed');
+            const checkbox = taskElement.querySelector('.checkbox');
+            
+            if (taskElement.classList.contains('completed')) {
+                checkbox.innerHTML = '✓';
+            } else {
+                checkbox.innerHTML = '';
+            }
+            
+            updateProgress();
+            saveProgress();
+        }
+        
+        function updateProgress() {
+            const totalTasks = tasks.length;
+            const completedTasks = document.querySelectorAll('.task.completed').length;
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            document.getElementById('completed').textContent = completedTasks;
+            document.getElementById('total').textContent = totalTasks;
+            document.getElementById('percentage').textContent = percentage;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+        
+        function saveProgress() {
+            // Store progress in memory during session
+            progress = {};
+            tasks.forEach((task, index) => {
+                progress[index] = {
+                    text: task.querySelector('.task-text').textContent,
+                    completed: task.classList.contains('completed')
+                };
+            });
+        }
+        
+        function downloadChecklist() {
+            let content = "KAIZEN PRE-EVENT CHECKLIST\n";
+            content += "==========================\n\n";
+            content += "Generated: " + new Date().toLocaleDateString() + "\n\n";
+            
+            const sections = document.querySelectorAll('.checklist');
+            sections.forEach(section => {
+                const title = section.querySelector('h3').textContent;
+                content += title + "\n";
+                content += "-".repeat(title.length) + "\n";
+                
+                const sectionTasks = section.querySelectorAll('.task');
+                sectionTasks.forEach(task => {
+                    const isCompleted = task.classList.contains('completed');
+                    const text = task.querySelector('.task-text').textContent;
+                    const priority = task.querySelector('.priority').textContent;
+                    content += `${isCompleted ? '[✓]' : '[ ]'} ${text} (${priority})\n`;
+                });
+                content += "\n";
+            });
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kaizen-checklist.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function resetChecklist() {
+            if (confirm('Reset all progress? This cannot be undone.')) {
+                tasks.forEach(task => {
+                    task.classList.remove('completed');
+                    task.querySelector('.checkbox').innerHTML = '';
+                });
+                updateProgress();
+                progress = {}; // Clear in-memory progress
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeTasks);
+    </script>
+</body>
+</html>
