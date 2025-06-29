@@ -1,0 +1,565 @@
+event-timer/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaizen Event Timer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #faf8f5 0%, #f0f9ff 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(26, 54, 93, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #1a365d;
+        }
+        
+        .timer-display {
+            background: linear-gradient(135deg, #1a365d, #0f766e);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .current-time {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .current-phase {
+            font-size: 24px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .phase-progress {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #20c997;
+            height: 100%;
+            width: 0%;
+            transition: width 1s ease;
+            border-radius: 4px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        
+        .btn-primary { background: #1a365d; color: white; }
+        .btn-success { background: #0f766e; color: white; }
+        .btn-warning { background: #d97706; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        
+        .btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .schedule {
+            background: #faf8f5;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 2px solid #0f766e;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #e5e5e5;
+            transition: all 0.3s ease;
+        }
+        
+        .schedule-item.current {
+            border-left-color: #0f766e;
+            background: #ecfdf5;
+            box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2);
+        }
+        
+        .schedule-item.completed {
+            border-left-color: #20c997;
+            background: #f0f9ff;
+            opacity: 0.7;
+        }
+        
+        .phase-name {
+            font-weight: bold;
+            color: #1a365d;
+        }
+        
+        .phase-time {
+            color: #0f766e;
+            font-weight: bold;
+        }
+        
+        .phase-duration {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .notification {
+            background: #0f766e;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: slideIn 0.5s ease;
+            max-width: 300px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .break-alert {
+            background: #d97706 !important;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e5e5e5;
+            transition: border-color 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #0f766e;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1a365d;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .current-time { font-size: 36px; }
+            .current-phase { font-size: 18px; }
+            .controls { flex-direction: column; align-items: center; }
+            .btn { min-width: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏱️ Kaizen Event Timer</h1>
+            <p>Professional schedule management for one-day improvement events</p>
+        </div>
+        
+        <div class="timer-display">
+            <div class="current-time" id="currentTime">00:00:00</div>
+            <div class="current-phase" id="currentPhase">Ready to Start</div>
+            <div class="phase-progress">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="phaseTimer">Next: Opening & Introductions</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-success" id="startBtn" onclick="startEvent()">🚀 Start Event</button>
+            <button class="btn btn-warning" id="pauseBtn" onclick="pauseEvent()" disabled>⏸️ Pause</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextPhase()" disabled>⏭️ Next Phase</button>
+            <button class="btn btn-danger" id="resetBtn" onclick="resetEvent()">🔄 Reset</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalElapsed">0:00</div>
+                <div class="stat-label">Total Elapsed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="currentPhaseTime">0:00</div>
+                <div class="stat-label">Current Phase</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedPhases">0</div>
+                <div class="stat-label">Phases Complete</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="estimatedEnd">--:--</div>
+                <div class="stat-label">Estimated End</div>
+            </div>
+        </div>
+        
+        <div class="schedule">
+            <h3>📋 Today's Schedule</h3>
+            <div id="scheduleList"></div>
+        </div>
+    </div>
+    
+    <div class="notifications" id="notifications"></div>
+    
+    <script>
+        const schedule = [
+            { name: "Opening & Introductions", duration: 30, type: "session" },
+            { name: "Problem Definition & Goals", duration: 45, type: "session" },
+            { name: "Current State Analysis", duration: 60, type: "session" },
+            { name: "Morning Break", duration: 15, type: "break" },
+            { name: "Root Cause Analysis", duration: 75, type: "session" },
+            { name: "Solution Brainstorming", duration: 60, type: "session" },
+            { name: "Lunch Break", duration: 60, type: "break" },
+            { name: "Solution Selection & Planning", duration: 75, type: "session" },
+            { name: "Implementation Planning", duration: 45, type: "session" },
+            { name: "Afternoon Break", duration: 15, type: "break" },
+            { name: "Action Plan Development", duration: 60, type: "session" },
+            { name: "Presentation Preparation", duration: 30, type: "session" },
+            { name: "Final Presentations", duration: 45, type: "session" },
+            { name: "Wrap-up & Next Steps", duration: 15, type: "session" }
+        ];
+        
+        let eventStartTime = null;
+        let currentPhaseIndex = 0;
+        let phaseStartTime = null;
+        let isPaused = false;
+        let totalPausedTime = 0;
+        let pauseStartTime = null;
+        let phasePausedTime = 0;
+        let timerInterval = null;
+        
+        function initializeSchedule() {
+            const scheduleList = document.getElementById('scheduleList');
+            scheduleList.innerHTML = '';
+            
+            let cumulativeTime = 0;
+            schedule.forEach((phase, index) => {
+                const item = document.createElement('div');
+                item.className = 'schedule-item';
+                item.id = `schedule-${index}`;
+                
+                const startTime = formatTime(cumulativeTime);
+                const endTime = formatTime(cumulativeTime + phase.duration);
+                
+                item.innerHTML = `
+                    <div>
+                        <div class="phase-name">${phase.name}</div>
+                        <div class="phase-duration">${phase.duration} minutes</div>
+                    </div>
+                    <div class="phase-time">${startTime} - ${endTime}</div>
+                `;
+                
+                scheduleList.appendChild(item);
+                cumulativeTime += phase.duration;
+            });
+            
+            updateEstimatedEnd();
+        }
+        
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours}:${mins.toString().padStart(2, '0')}`;
+        }
+        
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function startEvent() {
+            if (!eventStartTime) {
+                // First time starting
+                eventStartTime = new Date();
+                phaseStartTime = new Date();
+                currentPhaseIndex = 0;
+                totalPausedTime = 0;
+                phasePausedTime = 0;
+            } else if (isPaused) {
+                // Resuming from pause
+                const pauseDuration = new Date() - pauseStartTime;
+                totalPausedTime += pauseDuration;
+                phasePausedTime += pauseDuration;
+            }
+            
+            isPaused = false;
+            pauseStartTime = null;
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('nextBtn').disabled = false;
+            
+            updateCurrentPhase();
+            startTimer();
+            showNotification(`Event ${eventStartTime ? 'resumed' : 'started'}! Current phase: ${schedule[currentPhaseIndex].name}`);
+        }
+        
+        function pauseEvent() {
+            isPaused = true;
+            pauseStartTime = new Date();
+            clearInterval(timerInterval);
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            
+            showNotification("Event paused. Click Start to resume.");
+        }
+        
+        function nextPhase() {
+            if (currentPhaseIndex < schedule.length - 1) {
+                // Mark current phase as completed
+                document.getElementById(`schedule-${currentPhaseIndex}`).classList.add('completed');
+                
+                currentPhaseIndex++;
+                phaseStartTime = new Date();
+                phasePausedTime = 0; // Reset phase paused time
+                
+                updateCurrentPhase();
+                
+                const currentPhase = schedule[currentPhaseIndex];
+                if (currentPhase.type === 'break') {
+                    showNotification(`Break time: ${currentPhase.name} (${currentPhase.duration} minutes)`, 'break');
+                } else {
+                    showNotification(`New phase: ${currentPhase.name}`);
+                }
+            } else {
+                endEvent();
+            }
+        }
+        
+        function resetEvent() {
+            // Clear timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Reset all variables
+            eventStartTime = null;
+            phaseStartTime = null;
+            currentPhaseIndex = 0;
+            isPaused = false;
+            totalPausedTime = 0;
+            pauseStartTime = null;
+            phasePausedTime = 0;
+            
+            // Reset button states
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            
+            // Reset display
+            document.getElementById('currentTime').textContent = '00:00:00';
+            document.getElementById('currentPhase').textContent = 'Ready to Start';
+            document.getElementById('phaseTimer').textContent = 'Next: Opening & Introductions';
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // Reset schedule items
+            document.querySelectorAll('.schedule-item').forEach(item => {
+                item.classList.remove('current', 'completed');
+            });
+            
+            // Reset stats display
+            document.getElementById('totalElapsed').textContent = '0:00';
+            document.getElementById('currentPhaseTime').textContent = '0:00';
+            document.getElementById('completedPhases').textContent = '0';
+            updateEstimatedEnd();
+            
+            showNotification("Event reset successfully");
+        }
+        
+        function updateCurrentPhase() {
+            // Update current phase highlighting
+            document.querySelectorAll('.schedule-item').forEach(item => {
+                item.classList.remove('current');
+            });
+            
+            if (currentPhaseIndex < schedule.length) {
+                document.getElementById(`schedule-${currentPhaseIndex}`).classList.add('current');
+                document.getElementById('currentPhase').textContent = schedule[currentPhaseIndex].name;
+                
+                const nextPhase = currentPhaseIndex < schedule.length - 1 ? 
+                    schedule[currentPhaseIndex + 1].name : 'Event Complete';
+                document.getElementById('phaseTimer').textContent = `Next: ${nextPhase}`;
+            }
+        }
+        
+        function startTimer() {
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function updateTimer() {
+            if (isPaused || !eventStartTime) return;
+            
+            const now = new Date();
+            const rawTotalElapsed = now - eventStartTime;
+            const totalElapsed = Math.floor((rawTotalElapsed - totalPausedTime) / 1000);
+            
+            const rawPhaseElapsed = now - phaseStartTime;
+            const phaseElapsed = Math.floor((rawPhaseElapsed - phasePausedTime) / 1000);
+            
+            document.getElementById('currentTime').textContent = formatDuration(totalElapsed);
+            
+            // Update phase progress
+            if (currentPhaseIndex < schedule.length) {
+                const phaseDurationSeconds = schedule[currentPhaseIndex].duration * 60;
+                const progress = Math.min((phaseElapsed / phaseDurationSeconds) * 100, 100);
+                document.getElementById('progressFill').style.width = progress + '%';
+                
+                // Auto-advance if phase time exceeded
+                if (phaseElapsed >= phaseDurationSeconds && currentPhaseIndex < schedule.length - 1) {
+                    nextPhase();
+                }
+            }
+            
+            updateStats();
+        }
+        
+        function updateStats() {
+            if (!eventStartTime) {
+                document.getElementById('totalElapsed').textContent = '0:00';
+                document.getElementById('currentPhaseTime').textContent = '0:00';
+                document.getElementById('completedPhases').textContent = '0';
+                return;
+            }
+            
+            const now = new Date();
+            const rawTotalElapsed = now - eventStartTime;
+            const totalElapsed = Math.floor((rawTotalElapsed - totalPausedTime) / 1000);
+            
+            const rawPhaseElapsed = phaseStartTime ? now - phaseStartTime : 0;
+            const phaseElapsed = Math.floor((rawPhaseElapsed - phasePausedTime) / 1000);
+            
+            document.getElementById('totalElapsed').textContent = formatDuration(totalElapsed);
+            document.getElementById('currentPhaseTime').textContent = formatDuration(phaseElapsed);
+            document.getElementById('completedPhases').textContent = currentPhaseIndex.toString();
+        }
+        
+        function updateEstimatedEnd() {
+            if (!eventStartTime) {
+                const totalMinutes = schedule.reduce((sum, phase) => sum + phase.duration, 0);
+                const endTime = new Date();
+                endTime.setMinutes(endTime.getMinutes() + totalMinutes);
+                document.getElementById('estimatedEnd').textContent = 
+                    endTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+        }
+        
+        function endEvent() {
+            clearInterval(timerInterval);
+            document.getElementById('currentPhase').textContent = 'Event Complete! 🎉';
+            document.getElementById('phaseTimer').textContent = 'Well done!';
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            
+            showNotification('🎉 Kaizen event completed successfully! Great work team!');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type === 'break' ? 'break-alert' : ''}`;
+            notification.textContent = message;
+            
+            document.getElementById('notifications').appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSchedule();
+            updateStats();
